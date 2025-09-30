@@ -2,14 +2,29 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>D3 Scatterplot</title>
+  <title>D3 Scatterplot with Tooltips</title>
+  <style>
+    /* Simple tooltip styling */
+    .tooltip {
+      position: absolute;
+      background: #333;
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none; /* don’t block mouse */
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+  </style>
 </head>
 <body>
   <svg width="500" height="400"></svg>
+  <div class="tooltip" id="tooltip"></div>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
-    // 1. Example dataset (x, y values)
+    // 1. Example dataset
     const data = [
       { x: 10, y: 20 },
       { x: 40, y: 90 },
@@ -23,16 +38,16 @@
     const width = +svg.attr("width");
     const height = +svg.attr("height");
 
-    // 2. Create scales (map data to screen space)
+    // 2. Scales
     const xScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.x)])  // input range
-      .range([40, width - 20]);             // output range
+      .domain([0, d3.max(data, d => d.x)])
+      .range([40, width - 20]);
 
     const yScale = d3.scaleLinear()
       .domain([0, d3.max(data, d => d.y)])
-      .range([height - 40, 20]); // note: flip y (SVG origin at top-left)
+      .range([height - 40, 20]);
 
-    // 3. Draw axes
+    // 3. Axes
     svg.append("g")
       .attr("transform", `translate(0,${height - 40})`)
       .call(d3.axisBottom(xScale));
@@ -41,7 +56,10 @@
       .attr("transform", `translate(40,0)`)
       .call(d3.axisLeft(yScale));
 
-    // 4. Draw circles for each point
+    // 4. Tooltip reference
+    const tooltip = d3.select("#tooltip");
+
+    // 5. Draw circles with tooltip interaction
     svg.selectAll("circle")
       .data(data)
       .enter()
@@ -49,7 +67,18 @@
       .attr("cx", d => xScale(d.x))
       .attr("cy", d => yScale(d.y))
       .attr("r", 6)
-      .attr("fill", "steelblue");
+      .attr("fill", "steelblue")
+      .on("mouseover", (event, d) => {
+        tooltip.style("opacity", 1)
+          .html(`<strong>x:</strong> ${d.x}, <strong>y:</strong> ${d.y}`);
+      })
+      .on("mousemove", (event) => {
+        tooltip.style("left", (event.pageX + 10) + "px")
+               .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseleave", () => {
+        tooltip.style("opacity", 0);
+      });
   </script>
 </body>
 </html>
