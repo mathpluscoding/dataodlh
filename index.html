@@ -1,11 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Wonhee's Data Science Page</title>
-  </head>
-  <body>
-    <h1>This Mr. Jung's Data Science page.</h1>
-    <p>I will be sharing cool data visualizations on this page.</p>
-    <img src="odlhlogo.webp">
-  </body>
+<head>
+  <meta charset="utf-8">
+  <title>D3 Bar Chart</title>
+</head>
+<body>
+  <svg width="500" height="200"></svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const data = [30, 80, 45, 60, 20, 90, 50];
+
+    const svg = d3.select("svg");
+    const height = 200;
+    const width = 500;
+    const barWidth = width / data.length;
+
+    svg.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("x", (d, i) => i * barWidth)
+      .attr("y", d => height - d)
+      .attr("width", barWidth - 2)
+      .attr("height", d => d)
+      .attr("fill", "steelblue");
+  </script>
+</body>
 </html>
