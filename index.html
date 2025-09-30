@@ -2,28 +2,53 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>D3 Bar Chart</title>
+  <title>D3 Scatterplot</title>
 </head>
 <body>
-  <svg width="500" height="200"></svg>
+  <svg width="500" height="400"></svg>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
-    const data = [30, 80, 45, 60, 20, 90, 50];
+    // 1. Example dataset (x, y values)
+    const data = [
+      { x: 10, y: 20 },
+      { x: 40, y: 90 },
+      { x: 80, y: 50 },
+      { x: 120, y: 150 },
+      { x: 200, y: 80 },
+      { x: 250, y: 120 }
+    ];
 
     const svg = d3.select("svg");
-    const height = 200;
-    const width = 500;
-    const barWidth = width / data.length;
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
 
-    svg.selectAll("rect")
+    // 2. Create scales (map data to screen space)
+    const xScale = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.x)])  // input range
+      .range([40, width - 20]);             // output range
+
+    const yScale = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.y)])
+      .range([height - 40, 20]); // note: flip y (SVG origin at top-left)
+
+    // 3. Draw axes
+    svg.append("g")
+      .attr("transform", `translate(0,${height - 40})`)
+      .call(d3.axisBottom(xScale));
+
+    svg.append("g")
+      .attr("transform", `translate(40,0)`)
+      .call(d3.axisLeft(yScale));
+
+    // 4. Draw circles for each point
+    svg.selectAll("circle")
       .data(data)
       .enter()
-      .append("rect")
-      .attr("x", (d, i) => i * barWidth)
-      .attr("y", d => height - d)
-      .attr("width", barWidth - 2)
-      .attr("height", d => d)
+      .append("circle")
+      .attr("cx", d => xScale(d.x))
+      .attr("cy", d => yScale(d.y))
+      .attr("r", 6)
       .attr("fill", "steelblue");
   </script>
 </body>
